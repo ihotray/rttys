@@ -334,7 +334,18 @@ func apiStart(br *broker) {
 		handleCmdReq(br, c)
 	})
 
-	r.Any("/web/:devid/:proto/:addr/*path", func(c *gin.Context) {
+	r.Any("/95bed67741674b5e097b9b1baf44543f/web/:sid/:devid/:proto/:addr/*path", func(c *gin.Context) {
+		//log.Printf("web api to 95bed67741674b5e097b9b1baf44543f, %+v", c.Params)
+		sid := c.Param("sid")
+
+		//check auth
+		if !httpSessions.Have(sid) {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		httpSessions.Active(sid, 0)
+
 		httpProxyRedirect(br, c)
 	})
 

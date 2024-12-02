@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -308,6 +309,9 @@ func httpProxyRedirect(br *broker, c *gin.Context) {
 	}
 
 	location := cfg.HttpProxyRedirURL
+	if strings.HasPrefix(location, "https://*") || strings.HasPrefix(location, "http://*") {
+		location = strings.Replace(location, "*", devid, 1)
+	}
 
 	if location == "" {
 		host, _, err := net.SplitHostPort(c.Request.Host)
