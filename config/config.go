@@ -15,19 +15,20 @@ type Config struct {
 	AddrDev           string
 	AddrUser          string
 	AddrHttpProxy     string
-	DisableSignUp	   	  bool
+	DisableSignUp     bool
 	HttpProxyRedirURL string
 	HttpProxyPort     int
 	SslCert           string
 	SslKey            string
 	SslCacert         string // mTLS for device
-	WebUISslCert       string
-	WebUISslKey        string
+	WebUISslCert      string
+	WebUISslKey       string
 	Token             string
 	WhiteList         map[string]bool
 	DB                string
 	LocalAuth         bool
 	SeparateSslConfig bool
+	AccessSecret      string
 }
 
 func getConfigOpt(yamlCfg *yaml.File, name string, opt interface{}) {
@@ -52,7 +53,7 @@ func Parse(c *cli.Context) *Config {
 		AddrDev:           c.String("addr-dev"),
 		AddrUser:          c.String("addr-user"),
 		AddrHttpProxy:     c.String("addr-http-proxy"),
-		DisableSignUp:      c.Bool("disable-sign-up"),
+		DisableSignUp:     c.Bool("disable-sign-up"),
 		HttpProxyRedirURL: c.String("http-proxy-redir-url"),
 		SslCert:           c.String("ssl-cert"),
 		SslKey:            c.String("ssl-key"),
@@ -63,6 +64,7 @@ func Parse(c *cli.Context) *Config {
 		Token:             c.String("token"),
 		DB:                c.String("db"),
 		LocalAuth:         c.Bool("local-auth"),
+		AccessSecret:      c.String("access-secret"),
 	}
 
 	cfg.WhiteList = make(map[string]bool)
@@ -108,6 +110,7 @@ func Parse(c *cli.Context) *Config {
 				}
 			}
 		}
+		getConfigOpt(yamlCfg, "access-secret", &cfg.AccessSecret)
 	}
 
 	if cfg.SslCert != "" && cfg.SslKey != "" {

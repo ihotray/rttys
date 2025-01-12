@@ -364,7 +364,7 @@ export default {
         const sid = sessionStorage.getItem('rttys-sid') || 'none'
 
         const addr = encodeURIComponent(`${url.ip}:${url.port}${url.path}`)
-        const address = `https://${dev.id}.proxy.devops.hotray.cn/95bed67741674b5e097b9b1baf44543f/web/${sid}/${dev.id}/${url.proto}/${addr}`
+        const address = `https://${dev.id}.proxy.devops.hotray.cn/devops/gotoweb/${sid}/${dev.id}/${url.proto}/${addr}`
         console.log('address: ' + address)
         window.open(address)
       })

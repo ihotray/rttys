@@ -17,6 +17,7 @@ import (
 	"rttys/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -334,17 +335,38 @@ func apiStart(br *broker) {
 		handleCmdReq(br, c)
 	})
 
-	r.Any("/95bed67741674b5e097b9b1baf44543f/web/:sid/:devid/:proto/:addr/*path", func(c *gin.Context) {
-		//log.Printf("web api to 95bed67741674b5e097b9b1baf44543f, %+v", c.Params)
+	r.Any("/devops/gotoweb/:sid/:devid/:proto/:addr/*path", func(c *gin.Context) {
 		sid := c.Param("sid")
 
 		//check auth
-		if !httpSessions.Have(sid) {
+		if httpSessions.Have(sid) {
+			httpSessions.Active(sid, 0)
+			httpProxyRedirect(br, c)
+			return
+		}
+
+		token, err := jwt.Parse(sid, func(t *jwt.Token) (interface{}, error) {
+			return []byte(cfg.AccessSecret), nil
+		})
+
+		if err != nil || !token.Valid {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		httpSessions.Active(sid, 0)
+		if uid, ok := token.Claims.(jwt.MapClaims)["uid"]; !ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		} else {
+			log.Printf("uid: %v", uid)
+		}
+
+		if role, ok := token.Claims.(jwt.MapClaims)["role"]; !ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		} else {
+			log.Printf("role: %v", role)
+		}
 
 		httpProxyRedirect(br, c)
 	})
